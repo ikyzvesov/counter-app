@@ -8,9 +8,8 @@
   <style>
     body {
       margin: 0;
-      background: #111;
-      color: white;
-      font-family: Arial;
+      background: #f2f2f7;
+      font-family: -apple-system, BlinkMacSystemFont, sans-serif;
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -18,33 +17,48 @@
       height: 100vh;
     }
 
-    h1 {
-      font-size: 80px;
+    .counter {
+      font-size: 100px;
+      font-weight: 600;
+      color: #000;
       margin-bottom: 40px;
     }
 
+    .buttons {
+      display: flex;
+      gap: 20px;
+    }
+
     button {
+      width: 80px;
+      height: 80px;
       font-size: 40px;
-      margin: 10px;
-      padding: 20px 40px;
       border: none;
-      border-radius: 15px;
-      background: #333;
-      color: white;
+      border-radius: 20px;
+      background: white;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
 
     button:active {
-      background: #555;
+      transform: scale(0.95);
+    }
+
+    .minus {
+      color: red;
+    }
+
+    .plus {
+      color: green;
     }
   </style>
 </head>
 <body>
 
-<h1 id="count">0</h1>
+<div class="counter" id="count">0</div>
 
-<div>
-  <button onclick="minus()">-</button>
-  <button onclick="plus()">+</button>
+<div class="buttons">
+  <button class="minus" onclick="minus()">−</button>
+  <button class="plus" onclick="plus()">+</button>
 </div>
 
 <script>
@@ -56,7 +70,7 @@ if (count === null) {
   count = parseInt(count);
 }
 
-document.getElementById("count").innerText = count;
+updateDisplay();
 
 function plus() {
   count++;
@@ -69,8 +83,12 @@ function minus() {
 }
 
 function update() {
-  document.getElementById("count").innerText = count;
   localStorage.setItem("count", count);
+  updateDisplay();
+}
+
+function updateDisplay() {
+  document.getElementById("count").innerText = count;
 }
 </script>
 
