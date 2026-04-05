@@ -2,181 +2,128 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<title>Counter</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Orders Tracker</title>
 
 <style>
-body {
-  margin: 0;
-  background: #e9e9e9;
-  font-family: Arial, sans-serif;
-  text-align: center;
-}
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: Arial, sans-serif;
+    }
 
-/* Заголовок */
-.title {
-  font-size: 40px;
-  margin-top: 60px;
-  color: #555;
-}
+    body {
+        background: linear-gradient(135deg, #1e1e2f, #2c2c54);
+        color: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
 
-/* Контейнер */
-.display {
-  margin: 30px auto;
-  padding: 15px;
-  background: #9aa0a6;
-  border-radius: 20px;
-  display: inline-flex;
-  gap: 10px;
-}
+    .app {
+        width: 100%;
+        max-width: 350px;
+        padding: 20px;
+        border-radius: 20px;
+        background: rgba(255,255,255,0.05);
+        backdrop-filter: blur(10px);
+        text-align: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
 
-/* Окно цифры */
-.digit-box {
-  width: 60px;
-  height: 80px;
-  overflow: hidden;
-  background: black;
-  border-radius: 10px;
-  position: relative;
-}
+    h1 {
+        font-size: 18px;
+        opacity: 0.7;
+        margin-bottom: 10px;
+    }
 
-/* Лента цифр */
-.digit-strip {
-  position: absolute;
-  width: 100%;
-  transition: transform 0.3s ease-in-out;
-}
+    .counter {
+        font-size: 60px;
+        font-weight: bold;
+        margin: 20px 0;
+    }
 
-/* Одна цифра */
-.digit {
-  height: 80px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 60px;
-  color: white;
-}
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
 
-/* Кнопки */
-.buttons {
-  margin-top: 40px;
-  display: flex;
-  justify-content: center;
-  gap: 40px;
-}
+    button {
+        padding: 15px;
+        font-size: 18px;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: 0.2s;
+    }
 
-.btn {
-  width: 100px;
-  height: 100px;
-  font-size: 50px;
-  border: none;
-  border-radius: 20px;
-}
+    button:active {
+        transform: scale(0.95);
+    }
 
-.minus {
-  background: #e6d7c3;
-}
+    .add {
+        background: #00c853;
+        color: white;
+    }
 
-.plus {
-  background: #7ed37e;
-}
+    .reset {
+        background: #ff5252;
+        color: white;
+    }
 
-.btn:active {
-  transform: scale(0.95);
-}
+    .footer {
+        margin-top: 15px;
+        font-size: 12px;
+        opacity: 0.5;
+    }
 </style>
 </head>
 
 <body>
 
-<div class="title">Заказы</div>
+<div class="app">
+    <h1>Заказы сегодня</h1>
+    <div class="counter" id="counter">0</div>
 
-<div class="display" id="display"></div>
+    <div class="buttons">
+        <button class="add" onclick="addOrder()">➕ Добавить заказ</button>
+        <button class="reset" onclick="resetOrders()">♻️ Обнулить</button>
+    </div>
 
-<div class="buttons">
-  <button class="btn minus" onclick="minus()">−</button>
-  <button class="btn plus" onclick="plus()">+</button>
+    <div class="footer">Работает в реальном времени</div>
 </div>
 
 <script>
-let count = localStorage.getItem("count");
+    let count = localStorage.getItem("orders") || 0;
+    document.getElementById("counter").innerText = count;
 
-if (count === null) {
-  count = 0;
-} else {
-  count = parseInt(count);
-}
+    function addOrder() {
+        count++;
+        update();
+    }
 
-let strips = [];
+    function resetOrders() {
+        if(confirm("Точно обнулить?")) {
+            count = 0;
+            update();
+        }
+    }
 
-function createDigit(initial) {
-  let box = document.createElement("div");
-  box.className = "digit-box";
+    function update() {
+        document.getElementById("counter").innerText = count;
+        localStorage.setItem("orders", count);
+    }
 
-  let strip = document.createElement("div");
-  strip.className = "digit-strip";
-
-  for (let i = 0; i <= 9; i++) {
-    let d = document.createElement("div");
-    d.className = "digit";
-    d.innerText = i;
-    strip.appendChild(d);
-  }
-
-  box.appendChild(strip);
-  strips.push(strip);
-
-  return box;
-}
-
-function setupDisplay() {
-  let display = document.getElementById("display");
-  display.innerHTML = "";
-  strips = [];
-
-  let str = count.toString().padStart(4, '0');
-
-  for (let i = 0; i < str.length; i++) {
-    display.appendChild(createDigit(str[i]));
-  }
-
-  updateDisplay();
-}
-
-function updateDisplay() {
-  let str = count.toString().padStart(4, '0');
-
-  for (let i = 0; i < strips.length; i++) {
-    let digit = parseInt(str[i]);
-    strips[i].style.transform = `translateY(-${digit * 80}px)`;
-  }
-}
-
-function vibrate() {
-  if (navigator.vibrate) {
-    navigator.vibrate(30);
-  }
-}
-
-function update() {
-  localStorage.setItem("count", count);
-  updateDisplay();
-  vibrate();
-}
-
-function plus() {
-  count++;
-  update();
-}
-
-function minus() {
-  if (count > 0) {
-    count--;
-    update();
-  }
-}
-
-setupDisplay();
+    setInterval(() => {
+        let saved = localStorage.getItem("orders");
+        if (saved != count) {
+            count = saved;
+            document.getElementById("counter").innerText = count;
+        }
+    }, 1000);
 </script>
 
 </body>
