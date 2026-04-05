@@ -74,8 +74,16 @@
         color: white;
     }
 
-    .footer {
+    .time {
         margin-top: 15px;
+        font-size: 20px;
+        letter-spacing: 2px;
+        color: #00ffcc;
+        font-weight: bold;
+    }
+
+    .footer {
+        margin-top: 10px;
         font-size: 12px;
         opacity: 0.5;
     }
@@ -85,7 +93,7 @@
 <body>
 
 <div class="app">
-    <h1>Заказы сегодня</h1>
+    <h1>Колличество заказов</h1>
     <div class="counter" id="counter">0</div>
 
     <div class="buttons">
@@ -93,7 +101,8 @@
         <button class="reset" onclick="resetOrders()">♻️ Обнулить</button>
     </div>
 
-    <div class="footer">Работает в реальном времени</div>
+    <div class="time" id="time">00:00:00.000</div>
+    <div class="footer">Реальное время</div>
 </div>
 
 <script>
@@ -117,13 +126,29 @@
         localStorage.setItem("orders", count);
     }
 
+    // синхронизация между вкладками
     setInterval(() => {
         let saved = localStorage.getItem("orders");
         if (saved != count) {
             count = saved;
             document.getElementById("counter").innerText = count;
         }
-    }, 1000);
+    }, 500);
+
+    // часы с миллисекундами
+    function updateTime() {
+        const now = new Date();
+
+        let h = String(now.getHours()).padStart(2, '0');
+        let m = String(now.getMinutes()).padStart(2, '0');
+        let s = String(now.getSeconds()).padStart(2, '0');
+        let ms = String(now.getMilliseconds()).padStart(3, '0');
+
+        document.getElementById("time").innerText =
+            `${h}:${m}:${s}.${ms}`;
+    }
+
+    setInterval(updateTime, 10);
 </script>
 
 </body>
