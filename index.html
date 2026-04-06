@@ -3,77 +3,141 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orders App</title>
+<title>Neon Orders</title>
 
 <style>
-* { margin:0; padding:0; box-sizing:border-box; font-family:Arial; }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial;
+}
 
-body { background:#0f0f1a; color:white; }
+body {
+    background: #050510;
+    color: white;
+}
 
 /* Табы */
-.tabs { display:flex; }
-.tab {
-    flex:1;
-    padding:15px;
-    text-align:center;
-    background:#1c1c2e;
-    cursor:pointer;
+.tabs {
+    display: flex;
 }
-.tab.active { background:#00c853; }
+
+.tab {
+    flex: 1;
+    padding: 15px;
+    text-align: center;
+    background: #0d0d1a;
+    cursor: pointer;
+}
+
+.tab.active {
+    background: #00ffcc;
+    color: black;
+}
 
 /* Экраны */
-.screen { display:none; padding:20px; }
-.screen.active { display:block; }
+.screen {
+    display: none;
+    padding: 20px;
+}
 
-/* Счетчик */
+.screen.active {
+    display: block;
+}
+
+/* СЧЕТЧИК */
 .counter {
-    font-size:80px;
-    text-align:center;
-    margin:20px 0;
+    font-size: 90px;
+    text-align: center;
+    margin: 20px 0;
+    text-shadow: 0 0 20px #00ffcc;
 }
 
-/* Кнопки */
-.buttons { display:flex; gap:10px; }
+/* КНОПКИ */
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.row {
+    display: flex;
+    gap: 15px;
+}
+
 button {
-    flex:1;
-    padding:15px;
-    font-size:18px;
-    border:none;
-    border-radius:10px;
+    border: none;
+    cursor: pointer;
+    color: white;
+    font-size: 30px;
+    border-radius: 12px;
+    appearance: none;
 }
-.plus { background:#00c853; }
-.minus { background:#ff9800; }
-.reset { background:#ff5252; }
 
-/* Время */
+/* + и - квадратные */
+.square {
+    width: 100px;
+    height: 100px;
+}
+
+/* НЕОН */
+.plus {
+    background: #00ffcc;
+    color: black;
+    box-shadow: 0 0 20px #00ffcc;
+}
+
+.minus {
+    background: #ff9800;
+    box-shadow: 0 0 20px #ff9800;
+}
+
+.reset {
+    width: 200px;
+    height: 60px;
+    background: #ff3b3b;
+    box-shadow: 0 0 20px #ff3b3b;
+}
+
+/* Нажатие */
+button:active {
+    transform: scale(0.9);
+    opacity: 0.8;
+}
+
+/* ВРЕМЯ */
 .time {
-    font-size:42px;
-    text-align:center;
-    color:#00ffcc;
-    margin-top:20px;
+    font-size: 50px;
+    text-align: center;
+    margin-top: 25px;
+    color: #00ffcc;
+    text-shadow: 0 0 20px #00ffcc;
 }
 
-/* Деньги */
+/* ДЕНЬГИ */
 .money-total {
-    font-size:40px;
-    text-align:center;
-    margin:20px 0;
+    font-size: 40px;
+    text-align: center;
+    margin: 20px 0;
+    text-shadow: 0 0 15px #00ffcc;
 }
 
 input {
-    width:100%;
-    padding:15px;
-    margin-bottom:10px;
-    border-radius:10px;
-    border:none;
+    width: 100%;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    border: none;
 }
 
-/* Статистика */
+/* СТАТА */
 .stat {
-    background:rgba(255,255,255,0.05);
-    padding:10px;
-    border-radius:10px;
-    margin-bottom:8px;
+    background: rgba(0,255,204,0.1);
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 8px;
 }
 </style>
 </head>
@@ -88,24 +152,31 @@ input {
 
 <!-- ЗАКАЗЫ -->
 <div id="main" class="screen active">
+
     <div class="counter" id="counter">0</div>
 
-    <div class="buttons">
-        <button class="plus" onclick="add()">+</button>
-        <button class="minus" onclick="minus()">−</button>
-        <button class="reset" onclick="reset()">⟳</button>
+    <div class="controls">
+        <div class="row">
+            <button class="square plus" onclick="add()">+</button>
+            <button class="square minus" onclick="minus()">−</button>
+        </div>
+
+        <button class="reset" onclick="reset()">Сброс</button>
     </div>
 
     <div class="time" id="time">00:00:00.000</div>
+
 </div>
 
 <!-- ДЕНЬГИ -->
 <div id="money" class="screen">
+
     <div class="money-total" id="moneyTotal">0 ₴</div>
 
     <input type="number" id="moneyInput" placeholder="Сумма">
     <button class="plus" onclick="addMoney()">Добавить</button>
     <button class="reset" onclick="resetMoney()">Сброс</button>
+
 </div>
 
 <!-- СТАТИСТИКА -->
@@ -214,7 +285,7 @@ function updateUI() {
     document.getElementById("moneyTotal").innerText = money + " ₴";
 }
 
-/* Время */
+/* ВРЕМЯ */
 function updateTime() {
     const now = new Date();
 
