@@ -3,302 +3,377 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Neon Orders</title>
+<title>Orders Tracker</title>
 
 <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: Arial;
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
 }
 
-body {
-    background: #050510;
-    color: white;
+body{
+background:#0f1117;
+color:#e6edf3;
+padding:15px;
 }
 
-/* Табы */
-.tabs {
-    display: flex;
+.app{
+max-width:420px;
+margin:auto;
 }
 
-.tab {
-    flex: 1;
-    padding: 15px;
-    text-align: center;
-    background: #0d0d1a;
-    cursor: pointer;
+/* карточки */
+
+.card{
+background:#161b22;
+border-radius:14px;
+padding:18px;
+margin-bottom:15px;
+box-shadow:0 0 10px rgba(0,255,200,0.05);
 }
 
-.tab.active {
-    background: #00ffcc;
-    color: black;
+/* время */
+
+.time{
+font-size:56px;
+text-align:center;
+letter-spacing:2px;
+color:#7ef9e3;
 }
 
-/* Экраны */
-.screen {
-    display: none;
-    padding: 20px;
+/* счетчик */
+
+.counter{
+font-size:80px;
+text-align:center;
+margin:15px 0;
 }
 
-.screen.active {
-    display: block;
+/* кнопки */
+
+.controls{
+display:flex;
+justify-content:center;
+gap:12px;
 }
 
-/* СЧЕТЧИК */
-.counter {
-    font-size: 90px;
-    text-align: center;
-    margin: 20px 0;
-    text-shadow: 0 0 20px #00ffcc;
+.btn{
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:26px;
+color:white;
 }
 
-/* КНОПКИ */
-.controls {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
+.square{
+width:80px;
+height:80px;
 }
 
-.row {
-    display: flex;
-    gap: 15px;
+.plus{
+background:#1f8f6d;
 }
 
-button {
-    border: none;
-    cursor: pointer;
-    color: white;
-    font-size: 30px;
-    border-radius: 12px;
-    appearance: none;
+.minus{
+background:#c38b2c;
 }
 
-/* + и - квадратные */
-.square {
-    width: 100px;
-    height: 100px;
+.reset{
+display:block;
+margin:auto;
+margin-top:10px;
+width:180px;
+height:50px;
+background:#9b3a3a;
 }
 
-/* НЕОН */
-.plus {
-    background: #00ffcc;
-    color: black;
-    box-shadow: 0 0 20px #00ffcc;
+/* деньги */
+
+input{
+width:100%;
+padding:14px;
+border:none;
+border-radius:8px;
+margin-top:8px;
+margin-bottom:8px;
+font-size:18px;
+background:#0d1117;
+color:white;
 }
 
-.minus {
-    background: #ff9800;
-    box-shadow: 0 0 20px #ff9800;
+.addMoney{
+background:#238636;
+height:45px;
+width:100%;
 }
 
-.reset {
-    width: 200px;
-    height: 60px;
-    background: #ff3b3b;
-    box-shadow: 0 0 20px #ff3b3b;
+/* статистика */
+
+.stat-row{
+display:flex;
+justify-content:space-between;
+margin-top:8px;
+font-size:18px;
 }
 
-/* Нажатие */
-button:active {
-    transform: scale(0.9);
-    opacity: 0.8;
+/* календарь */
+
+.calendar{
+display:grid;
+grid-template-columns:repeat(7,1fr);
+gap:6px;
+margin-top:10px;
 }
 
-/* ВРЕМЯ */
-.time {
-    font-size: 50px;
-    text-align: center;
-    margin-top: 25px;
-    color: #00ffcc;
-    text-shadow: 0 0 20px #00ffcc;
+.day{
+background:#0d1117;
+padding:10px;
+text-align:center;
+border-radius:8px;
+font-size:13px;
+cursor:pointer;
 }
 
-/* ДЕНЬГИ */
-.money-total {
-    font-size: 40px;
-    text-align: center;
-    margin: 20px 0;
-    text-shadow: 0 0 15px #00ffcc;
+.day.active{
+background:#2ea043;
 }
 
-input {
-    width: 100%;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    border: none;
+.day.hasData{
+border:1px solid #2ea043;
 }
 
-/* СТАТА */
-.stat {
-    background: rgba(0,255,204,0.1);
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 8px;
+.day:hover{
+background:#1c2128;
 }
+
+.details{
+margin-top:10px;
+font-size:16px;
+}
+
 </style>
 </head>
 
 <body>
 
-<div class="tabs">
-    <div class="tab active" onclick="openTab('main')">📦</div>
-    <div class="tab" onclick="openTab('money')">💰</div>
-    <div class="tab" onclick="openTab('stats')">📊</div>
+<div class="app">
+
+<div class="card">
+<div class="time" id="time">00:00:00.000</div>
 </div>
 
-<!-- ЗАКАЗЫ -->
-<div id="main" class="screen active">
+<div class="card">
 
-    <div class="counter" id="counter">0</div>
+<div class="counter" id="counter">0</div>
 
-    <div class="controls">
-        <div class="row">
-            <button class="square plus" onclick="add()">+</button>
-            <button class="square minus" onclick="minus()">−</button>
-        </div>
+<div class="controls">
+<button class="btn square plus" onclick="add()">+</button>
+<button class="btn square minus" onclick="minus()">−</button>
+</div>
 
-        <button class="reset" onclick="reset()">Сброс</button>
-    </div>
-
-    <div class="time" id="time">00:00:00.000</div>
+<button class="btn reset" onclick="reset()">Сброс</button>
 
 </div>
 
-<!-- ДЕНЬГИ -->
-<div id="money" class="screen">
+<div class="card">
 
-    <div class="money-total" id="moneyTotal">0 ₴</div>
+<b>Сумма заказа</b>
 
-    <input type="number" id="moneyInput" placeholder="Сумма">
-    <button class="plus" onclick="addMoney()">Добавить</button>
-    <button class="reset" onclick="resetMoney()">Сброс</button>
+<input type="number" id="moneyInput" placeholder="Введите сумму">
+
+<button class="btn addMoney" onclick="addOrder()">Добавить заказ</button>
 
 </div>
 
-<!-- СТАТИСТИКА -->
-<div id="stats" class="screen">
-    <div id="statsList"></div>
+<div class="card">
+
+<b>Сегодня</b>
+
+<div class="stat-row">
+<span>Заказы</span>
+<span id="todayOrders">0</span>
+</div>
+
+<div class="stat-row">
+<span>Доход</span>
+<span id="todayMoney">0 ₴</span>
+</div>
+
+<div class="stat-row">
+<span>Средний чек</span>
+<span id="avgCheck">0 ₴</span>
+</div>
+
+</div>
+
+<div class="card">
+
+<b>Календарь статистики</b>
+
+<div class="calendar" id="calendar"></div>
+
+<div class="details" id="details">
+Нажмите на день
+</div>
+
+</div>
+
 </div>
 
 <script>
-let count = Number(localStorage.getItem("count")) || 0;
-let money = Number(localStorage.getItem("money")) || 0;
-let stats = JSON.parse(localStorage.getItem("stats")) || {};
 
-updateUI();
+let count=Number(localStorage.getItem("count"))||0
+let stats=JSON.parse(localStorage.getItem("stats"))||{}
 
-/* Табы */
-function openTab(tab) {
-    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
-    document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
-
-    document.getElementById(tab).classList.add("active");
-    event.target.classList.add("active");
-
-    if(tab === "stats") renderStats();
+function today(){
+return new Date().toLocaleDateString()
 }
 
-/* Дата */
-function today() {
-    return new Date().toLocaleDateString();
+function save(){
+localStorage.setItem("count",count)
+localStorage.setItem("stats",JSON.stringify(stats))
 }
 
-/* Счетчик */
-function add() {
-    count++;
-    updateStatsOrder();
-    save();
+/* счетчик */
+
+function add(){
+count++
+updateStatsOrder()
+save()
+updateUI()
 }
 
-function minus() {
-    if(count > 0) count--;
-    save();
+function minus(){
+if(count>0)count--
+save()
+updateUI()
 }
 
-function reset() {
-    if(confirm("Сбросить?")) {
-        count = 0;
-        save();
-    }
+function reset(){
+if(confirm("Сбросить счетчик?")){
+count=0
+save()
+updateUI()
+}
 }
 
-/* Деньги */
-function addMoney() {
-    let val = Number(document.getElementById("moneyInput").value);
-    if(!val) return;
+/* заказ */
 
-    money += val;
-    updateStatsMoney(val);
-    document.getElementById("moneyInput").value = "";
-    save();
+function addOrder(){
+
+let val=Number(document.getElementById("moneyInput").value)
+
+if(!val)return
+
+count++
+
+let d=today()
+
+if(!stats[d])stats[d]={orders:0,money:0}
+
+stats[d].orders++
+stats[d].money+=val
+
+document.getElementById("moneyInput").value=""
+
+save()
+updateUI()
+
 }
 
-function resetMoney() {
-    if(confirm("Сброс денег?")) {
-        money = 0;
-        save();
-    }
+function updateStatsOrder(){
+
+let d=today()
+
+if(!stats[d])stats[d]={orders:0,money:0}
+
+stats[d].orders++
+
 }
 
-/* Статистика */
-function updateStatsOrder() {
-    let d = today();
-    if(!stats[d]) stats[d] = {orders:0, money:0};
-    stats[d].orders++;
+/* интерфейс */
+
+function updateUI(){
+
+document.getElementById("counter").innerText=count
+
+let d=today()
+
+let orders=stats[d]?.orders||0
+let money=stats[d]?.money||0
+
+document.getElementById("todayOrders").innerText=orders
+document.getElementById("todayMoney").innerText=money+" ₴"
+
+let avg=orders?Math.round(money/orders):0
+document.getElementById("avgCheck").innerText=avg+" ₴"
+
+renderCalendar()
+
 }
 
-function updateStatsMoney(val) {
-    let d = today();
-    if(!stats[d]) stats[d] = {orders:0, money:0};
-    stats[d].money += val;
+/* календарь */
+
+function renderCalendar(){
+
+let calendar=document.getElementById("calendar")
+calendar.innerHTML=""
+
+for(let i=1;i<=31;i++){
+
+let div=document.createElement("div")
+div.className="day"
+div.innerText=i
+
+let key=i+"."+new Date().getMonth()+"."+new Date().getFullYear()
+
+if(stats[key]) div.classList.add("hasData")
+
+div.onclick=()=>showDay(key,i)
+
+calendar.appendChild(div)
+
 }
 
-function renderStats() {
-    let el = document.getElementById("statsList");
-    el.innerHTML = "";
-
-    Object.keys(stats).reverse().forEach(date => {
-        let s = stats[date];
-
-        let div = document.createElement("div");
-        div.className = "stat";
-        div.innerText = `${date} — 📦 ${s.orders} | 💰 ${s.money} ₴`;
-
-        el.appendChild(div);
-    });
 }
 
-/* Сохранение */
-function save() {
-    localStorage.setItem("count", count);
-    localStorage.setItem("money", money);
-    localStorage.setItem("stats", JSON.stringify(stats));
-    updateUI();
+function showDay(key,i){
+
+let d=stats[key]
+
+if(!d){
+document.getElementById("details").innerText="Нет данных за "+i
+return
 }
 
-function updateUI() {
-    document.getElementById("counter").innerText = count;
-    document.getElementById("moneyTotal").innerText = money + " ₴";
+document.getElementById("details").innerText=
+`${i} — 📦 ${d.orders} заказов | 💰 ${d.money} ₴`
+
 }
 
-/* ВРЕМЯ */
-function updateTime() {
-    const now = new Date();
+/* время */
 
-    let h = String(now.getHours()).padStart(2, '0');
-    let m = String(now.getMinutes()).padStart(2, '0');
-    let s = String(now.getSeconds()).padStart(2, '0');
-    let ms = String(now.getMilliseconds()).padStart(3, '0');
+function updateTime(){
 
-    document.getElementById("time").innerText =
-        `${h}:${m}:${s}.${ms}`;
+let n=new Date()
+
+let h=String(n.getHours()).padStart(2,'0')
+let m=String(n.getMinutes()).padStart(2,'0')
+let s=String(n.getSeconds()).padStart(2,'0')
+let ms=String(n.getMilliseconds()).padStart(3,'0')
+
+document.getElementById("time").innerText=
+`${h}:${m}:${s}.${ms}`
+
 }
 
-setInterval(updateTime, 10);
+setInterval(updateTime,10)
+
+updateUI()
+
 </script>
 
 </body>
