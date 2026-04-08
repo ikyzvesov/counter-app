@@ -25,8 +25,6 @@ max-width:420px;
 margin:auto;
 }
 
-/* карточки */
-
 .card{
 background:#161b22;
 border-radius:14px;
@@ -35,21 +33,12 @@ margin-bottom:15px;
 box-shadow:0 0 10px rgba(0,255,200,0.05);
 }
 
-/* время */
-
-.time{
-font-size:56px;
-text-align:center;
-letter-spacing:2px;
-color:#7ef9e3;
-}
-
 /* счетчик */
 
 .counter{
 font-size:80px;
 text-align:center;
-margin:15px 0;
+margin-bottom:10px;
 }
 
 /* кнопки */
@@ -90,7 +79,16 @@ height:50px;
 background:#9b3a3a;
 }
 
-/* деньги */
+/* время */
+
+.time{
+font-size:56px;
+text-align:center;
+letter-spacing:2px;
+color:#7ef9e3;
+}
+
+/* ввод денег */
 
 input{
 width:100%;
@@ -137,10 +135,6 @@ font-size:13px;
 cursor:pointer;
 }
 
-.day.active{
-background:#2ea043;
-}
-
 .day.hasData{
 border:1px solid #2ea043;
 }
@@ -161,9 +155,7 @@ font-size:16px;
 
 <div class="app">
 
-<div class="card">
-<div class="time" id="time">00:00:00.000</div>
-</div>
+<!-- счетчик -->
 
 <div class="card">
 
@@ -178,6 +170,14 @@ font-size:16px;
 
 </div>
 
+<!-- время -->
+
+<div class="card">
+<div class="time" id="time">00:00:00.000</div>
+</div>
+
+<!-- ввод суммы -->
+
 <div class="card">
 
 <b>Сумма заказа</b>
@@ -187,6 +187,8 @@ font-size:16px;
 <button class="btn addMoney" onclick="addOrder()">Добавить заказ</button>
 
 </div>
+
+<!-- статистика сегодня -->
 
 <div class="card">
 
@@ -208,6 +210,8 @@ font-size:16px;
 </div>
 
 </div>
+
+<!-- календарь -->
 
 <div class="card">
 
@@ -260,7 +264,7 @@ updateUI()
 }
 }
 
-/* заказ */
+/* добавление заказа */
 
 function addOrder(){
 
@@ -294,7 +298,7 @@ stats[d].orders++
 
 }
 
-/* интерфейс */
+/* обновление интерфейса */
 
 function updateUI(){
 
