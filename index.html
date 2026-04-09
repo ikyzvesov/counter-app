@@ -17,13 +17,43 @@ font-family:Arial;
 body{
 background:#0f1117;
 color:#e6edf3;
-padding:15px;
 }
 
 .app{
 max-width:420px;
 margin:auto;
+padding:15px;
 }
+
+/* вкладки */
+
+.tabs{
+display:flex;
+}
+
+.tab{
+flex:1;
+text-align:center;
+padding:12px;
+background:#161b22;
+cursor:pointer;
+}
+
+.tab.active{
+background:#1f8f6d;
+}
+
+/* экраны */
+
+.screen{
+display:none;
+}
+
+.screen.active{
+display:block;
+}
+
+/* карточки */
 
 .card{
 background:#161b22;
@@ -88,7 +118,7 @@ letter-spacing:2px;
 color:#7ef9e3;
 }
 
-/* ввод денег */
+/* ввод */
 
 input{
 width:100%;
@@ -117,35 +147,14 @@ margin-top:8px;
 font-size:18px;
 }
 
-/* календарь */
+/* журнал */
 
-.calendar{
-display:grid;
-grid-template-columns:repeat(7,1fr);
-gap:6px;
-margin-top:10px;
-}
-
-.day{
+.log{
 background:#0d1117;
 padding:10px;
-text-align:center;
 border-radius:8px;
-font-size:13px;
-cursor:pointer;
-}
-
-.day.hasData{
-border:1px solid #2ea043;
-}
-
-.day:hover{
-background:#1c2128;
-}
-
-.details{
-margin-top:10px;
-font-size:16px;
+margin-bottom:6px;
+font-size:15px;
 }
 
 </style>
@@ -153,9 +162,16 @@ font-size:16px;
 
 <body>
 
+<div class="tabs">
+<div class="tab active" onclick="openTab('main')">Главная</div>
+<div class="tab" onclick="openTab('history')">Журнал</div>
+</div>
+
 <div class="app">
 
-<!-- счетчик -->
+<!-- главный экран -->
+
+<div id="main" class="screen active">
 
 <div class="card">
 
@@ -170,13 +186,9 @@ font-size:16px;
 
 </div>
 
-<!-- время -->
-
 <div class="card">
 <div class="time" id="time">00:00:00.000</div>
 </div>
-
-<!-- ввод суммы -->
 
 <div class="card">
 
@@ -187,8 +199,6 @@ font-size:16px;
 <button class="btn addMoney" onclick="addOrder()">Добавить заказ</button>
 
 </div>
-
-<!-- статистика сегодня -->
 
 <div class="card">
 
@@ -211,16 +221,18 @@ font-size:16px;
 
 </div>
 
-<!-- календарь -->
+</div>
+
+<!-- журнал -->
+
+<div id="history" class="screen">
 
 <div class="card">
 
-<b>Календарь статистики</b>
+<b>Журнал заказов</b>
 
-<div class="calendar" id="calendar"></div>
+<div id="ordersLog"></div>
 
-<div class="details" id="details">
-Нажмите на день
 </div>
 
 </div>
@@ -231,6 +243,7 @@ font-size:16px;
 
 let count=Number(localStorage.getItem("count"))||0
 let stats=JSON.parse(localStorage.getItem("stats"))||{}
+let orders=JSON.parse(localStorage.getItem("orders"))||[]
 
 function today(){
 return new Date().toLocaleDateString()
@@ -239,6 +252,21 @@ return new Date().toLocaleDateString()
 function save(){
 localStorage.setItem("count",count)
 localStorage.setItem("stats",JSON.stringify(stats))
+localStorage.setItem("orders",JSON.stringify(orders))
+}
+
+/* вкладки */
+
+function openTab(tab){
+
+document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
+document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
+
+document.getElementById(tab).classList.add("active")
+event.target.classList.add("active")
+
+if(tab==="history") renderLog()
+
 }
 
 /* счетчик */
@@ -264,7 +292,7 @@ updateUI()
 }
 }
 
-/* добавление заказа */
+/* заказ */
 
 function addOrder(){
 
@@ -274,12 +302,21 @@ if(!val)return
 
 count++
 
-let d=today()
+let now=new Date()
 
-if(!stats[d])stats[d]={orders:0,money:0}
+let date=now.toLocaleDateString()
+let time=now.toLocaleTimeString()
 
-stats[d].orders++
-stats[d].money+=val
+orders.unshift({
+date:date,
+time:time,
+money:val
+})
+
+if(!stats[date])stats[date]={orders:0,money:0}
+
+stats[date].orders++
+stats[date].money+=val
 
 document.getElementById("moneyInput").value=""
 
@@ -298,7 +335,7 @@ stats[d].orders++
 
 }
 
-/* обновление интерфейса */
+/* интерфейс */
 
 function updateUI(){
 
@@ -306,55 +343,34 @@ document.getElementById("counter").innerText=count
 
 let d=today()
 
-let orders=stats[d]?.orders||0
-let money=stats[d]?.money||0
+let ordersToday=stats[d]?.orders||0
+let moneyToday=stats[d]?.money||0
 
-document.getElementById("todayOrders").innerText=orders
-document.getElementById("todayMoney").innerText=money+" ₴"
+document.getElementById("todayOrders").innerText=ordersToday
+document.getElementById("todayMoney").innerText=moneyToday+" ₴"
 
-let avg=orders?Math.round(money/orders):0
+let avg=ordersToday?Math.round(moneyToday/ordersToday):0
 document.getElementById("avgCheck").innerText=avg+" ₴"
 
-renderCalendar()
-
 }
 
-/* календарь */
+/* журнал */
 
-function renderCalendar(){
+function renderLog(){
 
-let calendar=document.getElementById("calendar")
-calendar.innerHTML=""
+let el=document.getElementById("ordersLog")
+el.innerHTML=""
 
-for(let i=1;i<=31;i++){
+orders.forEach(o=>{
 
 let div=document.createElement("div")
-div.className="day"
-div.innerText=i
+div.className="log"
 
-let key=i+"."+new Date().getMonth()+"."+new Date().getFullYear()
+div.innerText=`${o.date} ${o.time} — 💰 ${o.money} ₴`
 
-if(stats[key]) div.classList.add("hasData")
+el.appendChild(div)
 
-div.onclick=()=>showDay(key,i)
-
-calendar.appendChild(div)
-
-}
-
-}
-
-function showDay(key,i){
-
-let d=stats[key]
-
-if(!d){
-document.getElementById("details").innerText="Нет данных за "+i
-return
-}
-
-document.getElementById("details").innerText=
-`${i} — 📦 ${d.orders} заказов | 💰 ${d.money} ₴`
+})
 
 }
 
