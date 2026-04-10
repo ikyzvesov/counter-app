@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Orders Tracker</title>
+<title>Orders Tracker 2.0</title>
 
 <style>
 
@@ -17,37 +17,15 @@ font-family:Arial;
 body{
 background:#0f1117;
 color:#e6edf3;
+padding:15px;
 }
 
 .app{
 max-width:420px;
 margin:auto;
-padding:15px;
 }
 
-.tabs{
-display:flex;
-}
-
-.tab{
-flex:1;
-text-align:center;
-padding:12px;
-background:#161b22;
-cursor:pointer;
-}
-
-.tab.active{
-background:#1f8f6d;
-}
-
-.screen{
-display:none;
-}
-
-.screen.active{
-display:block;
-}
+/* карточки */
 
 .card{
 background:#161b22;
@@ -56,12 +34,21 @@ padding:18px;
 margin-bottom:15px;
 }
 
+/* время */
+
+.time{
+font-size:56px;
+text-align:center;
+letter-spacing:2px;
+color:#7ef9e3;
+}
+
 /* счетчик */
 
 .counter{
 font-size:80px;
 text-align:center;
-margin-bottom:10px;
+margin:15px 0;
 }
 
 /* кнопки */
@@ -102,13 +89,6 @@ height:50px;
 background:#9b3a3a;
 }
 
-.time{
-font-size:56px;
-text-align:center;
-letter-spacing:2px;
-color:#7ef9e3;
-}
-
 /* ввод */
 
 input{
@@ -138,9 +118,9 @@ margin-top:8px;
 font-size:18px;
 }
 
-/* журнал */
+/* история */
 
-.log{
+.day{
 background:#0d1117;
 padding:10px;
 border-radius:8px;
@@ -153,16 +133,9 @@ font-size:15px;
 
 <body>
 
-<div class="tabs">
-<div class="tab active" onclick="openTab('main')">Главная</div>
-<div class="tab" onclick="openTab('history')">Журнал</div>
-</div>
-
 <div class="app">
 
-<!-- главный экран -->
-
-<div id="main" class="screen active">
+<!-- счетчик -->
 
 <div class="card">
 
@@ -173,13 +146,17 @@ font-size:15px;
 <button class="btn square minus" onclick="minus()">−</button>
 </div>
 
-<button class="btn reset" onclick="resetCounter()">Сброс</button>
+<button class="btn reset" onclick="reset()">Сброс</button>
 
 </div>
+
+<!-- время -->
 
 <div class="card">
 <div class="time" id="time">00:00:00.000</div>
 </div>
+
+<!-- ввод суммы -->
 
 <div class="card">
 
@@ -190,6 +167,8 @@ font-size:15px;
 <button class="btn addMoney" onclick="addOrder()">Добавить заказ</button>
 
 </div>
+
+<!-- статистика сегодня -->
 
 <div class="card">
 
@@ -212,19 +191,13 @@ font-size:15px;
 
 </div>
 
-</div>
-
-<!-- журнал -->
-
-<div id="history" class="screen">
+<!-- история -->
 
 <div class="card">
 
-<b>Журнал заказов</b>
+<b>История по дням</b>
 
-<div id="ordersLog"></div>
-
-</div>
+<div id="history"></div>
 
 </div>
 
@@ -232,72 +205,56 @@ font-size:15px;
 
 <script>
 
-let counter = Number(localStorage.getItem("counter")) || 0
-let orders = JSON.parse(localStorage.getItem("orders")) || []
+let count=Number(localStorage.getItem("count"))||0
+let stats=JSON.parse(localStorage.getItem("stats"))||{}
 
-/* вкладки */
-
-function openTab(tab){
-
-document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"))
-document.querySelectorAll(".tab").forEach(t=>t.classList.remove("active"))
-
-document.getElementById(tab).classList.add("active")
-event.target.classList.add("active")
-
-if(tab==="history") renderLog()
-
+function today(){
+return new Date().toLocaleDateString()
 }
 
-/* + */
+function save(){
+localStorage.setItem("count",count)
+localStorage.setItem("stats",JSON.stringify(stats))
+}
+
+/* счетчик */
 
 function add(){
-
-counter++
+count++
+updateStatsOrder()
 save()
 updateUI()
-
 }
-
-/* - */
 
 function minus(){
-
-if(counter>0) counter--
-save()
-updateUI()
-
-}
-
-/* сброс */
-
-function resetCounter(){
-
-if(confirm("Сбросить счетчик?")){
-counter=0
+if(count>0)count--
 save()
 updateUI()
 }
 
+function reset(){
+if(confirm("Сбросить?")){
+count=0
+save()
+updateUI()
+}
 }
 
-/* добавить заказ */
+/* заказ */
 
 function addOrder(){
 
-let val = Number(document.getElementById("moneyInput").value)
+let val=Number(document.getElementById("moneyInput").value)
+if(!val)return
 
-if(!val) return
+count++
 
-counter++
+let d=today()
 
-let now = new Date()
+if(!stats[d])stats[d]={orders:0,money:0}
 
-orders.unshift({
-date:now.toLocaleDateString(),
-time:now.toLocaleTimeString(),
-money:val
-})
+stats[d].orders++
+stats[d].money+=val
 
 document.getElementById("moneyInput").value=""
 
@@ -306,12 +263,13 @@ updateUI()
 
 }
 
-/* сохранить */
+function updateStatsOrder(){
 
-function save(){
+let d=today()
 
-localStorage.setItem("counter",counter)
-localStorage.setItem("orders",JSON.stringify(orders))
+if(!stats[d])stats[d]={orders:0,money:0}
+
+stats[d].orders++
 
 }
 
@@ -319,41 +277,38 @@ localStorage.setItem("orders",JSON.stringify(orders))
 
 function updateUI(){
 
-document.getElementById("counter").innerText=counter
+document.getElementById("counter").innerText=count
 
-let today=new Date().toLocaleDateString()
+let d=today()
 
-let ordersToday=0
-let moneyToday=0
+let orders=stats[d]?.orders||0
+let money=stats[d]?.money||0
 
-orders.forEach(o=>{
-if(o.date===today){
-ordersToday++
-moneyToday+=o.money
-}
-})
+document.getElementById("todayOrders").innerText=orders
+document.getElementById("todayMoney").innerText=money+" ₴"
 
-document.getElementById("todayOrders").innerText=ordersToday
-document.getElementById("todayMoney").innerText=moneyToday+" ₴"
-
-let avg=ordersToday?Math.round(moneyToday/ordersToday):0
+let avg=orders?Math.round(money/orders):0
 document.getElementById("avgCheck").innerText=avg+" ₴"
 
+renderHistory()
+
 }
 
-/* журнал */
+/* история */
 
-function renderLog(){
+function renderHistory(){
 
-let el=document.getElementById("ordersLog")
+let el=document.getElementById("history")
 el.innerHTML=""
 
-orders.forEach(o=>{
+Object.keys(stats).reverse().forEach(date=>{
+
+let s=stats[date]
 
 let div=document.createElement("div")
-div.className="log"
+div.className="day"
 
-div.innerText=`${o.date} ${o.time} — 💰 ${o.money} ₴`
+div.innerText=`${date} — 📦 ${s.orders} | 💰 ${s.money} ₴`
 
 el.appendChild(div)
 
