@@ -41,8 +41,6 @@ cursor:pointer;
 background:#1f8f6d;
 }
 
-/* экраны */
-
 .screen{
 display:none;
 }
@@ -56,7 +54,6 @@ background:#161b22;
 border-radius:14px;
 padding:18px;
 margin-bottom:15px;
-box-shadow:0 0 10px rgba(0,255,200,0.05);
 }
 
 /* счетчик */
@@ -172,11 +169,11 @@ font-size:15px;
 <div class="counter" id="counter">0</div>
 
 <div class="controls">
-<button class="btn square plus" onclick="manualAdd()">+</button>
-<button class="btn square minus" onclick="manualMinus()">−</button>
+<button class="btn square plus" onclick="add()">+</button>
+<button class="btn square minus" onclick="minus()">−</button>
 </div>
 
-<button class="btn reset" onclick="reset()">Сброс</button>
+<button class="btn reset" onclick="resetCounter()">Сброс</button>
 
 </div>
 
@@ -235,6 +232,7 @@ font-size:15px;
 
 <script>
 
+let counter = Number(localStorage.getItem("counter")) || 0
 let orders = JSON.parse(localStorage.getItem("orders")) || []
 
 /* вкладки */
@@ -251,19 +249,54 @@ if(tab==="history") renderLog()
 
 }
 
+/* + */
+
+function add(){
+
+counter++
+save()
+updateUI()
+
+}
+
+/* - */
+
+function minus(){
+
+if(counter>0) counter--
+save()
+updateUI()
+
+}
+
+/* сброс */
+
+function resetCounter(){
+
+if(confirm("Сбросить счетчик?")){
+counter=0
+save()
+updateUI()
+}
+
+}
+
 /* добавить заказ */
 
 function addOrder(){
 
 let val = Number(document.getElementById("moneyInput").value)
+
 if(!val) return
+
+counter++
 
 let now = new Date()
 
 orders.unshift({
-date: now.toLocaleDateString(),
-time: now.toLocaleTimeString(),
-money: val
+date:now.toLocaleDateString(),
+time:now.toLocaleTimeString(),
+money:val
 })
 
 document.getElementById("moneyInput").value=""
@@ -273,71 +306,37 @@ updateUI()
 
 }
 
-/* ручной + */
-
-function manualAdd(){
-
-orders.unshift({
-date:new Date().toLocaleDateString(),
-time:new Date().toLocaleTimeString(),
-money:0
-})
-
-save()
-updateUI()
-
-}
-
-/* ручной - */
-
-function manualMinus(){
-
-orders.shift()
-
-save()
-updateUI()
-
-}
-
-/* сброс */
-
-function reset(){
-
-if(confirm("Сбросить всё?")){
-orders=[]
-save()
-updateUI()
-}
-
-}
-
 /* сохранить */
 
 function save(){
+
+localStorage.setItem("counter",counter)
 localStorage.setItem("orders",JSON.stringify(orders))
+
 }
 
-/* обновление интерфейса */
+/* интерфейс */
 
 function updateUI(){
 
-let today = new Date().toLocaleDateString()
+document.getElementById("counter").innerText=counter
 
-let todayOrders=0
-let todayMoney=0
+let today=new Date().toLocaleDateString()
+
+let ordersToday=0
+let moneyToday=0
 
 orders.forEach(o=>{
 if(o.date===today){
-todayOrders++
-todayMoney+=o.money
+ordersToday++
+moneyToday+=o.money
 }
 })
 
-document.getElementById("counter").innerText=todayOrders
-document.getElementById("todayOrders").innerText=todayOrders
-document.getElementById("todayMoney").innerText=todayMoney+" ₴"
+document.getElementById("todayOrders").innerText=ordersToday
+document.getElementById("todayMoney").innerText=moneyToday+" ₴"
 
-let avg = todayOrders ? Math.round(todayMoney/todayOrders) : 0
+let avg=ordersToday?Math.round(moneyToday/ordersToday):0
 document.getElementById("avgCheck").innerText=avg+" ₴"
 
 }
