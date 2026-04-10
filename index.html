@@ -25,8 +25,6 @@ margin:auto;
 padding:15px;
 }
 
-/* вкладки */
-
 .tabs{
 display:flex;
 }
@@ -52,8 +50,6 @@ display:none;
 .screen.active{
 display:block;
 }
-
-/* карточки */
 
 .card{
 background:#161b22;
@@ -108,8 +104,6 @@ width:180px;
 height:50px;
 background:#9b3a3a;
 }
-
-/* время */
 
 .time{
 font-size:56px;
@@ -178,8 +172,8 @@ font-size:15px;
 <div class="counter" id="counter">0</div>
 
 <div class="controls">
-<button class="btn square plus" onclick="add()">+</button>
-<button class="btn square minus" onclick="minus()">−</button>
+<button class="btn square plus" onclick="manualAdd()">+</button>
+<button class="btn square minus" onclick="manualMinus()">−</button>
 </div>
 
 <button class="btn reset" onclick="reset()">Сброс</button>
@@ -241,19 +235,7 @@ font-size:15px;
 
 <script>
 
-let count=Number(localStorage.getItem("count"))||0
-let stats=JSON.parse(localStorage.getItem("stats"))||{}
-let orders=JSON.parse(localStorage.getItem("orders"))||[]
-
-function today(){
-return new Date().toLocaleDateString()
-}
-
-function save(){
-localStorage.setItem("count",count)
-localStorage.setItem("stats",JSON.stringify(stats))
-localStorage.setItem("orders",JSON.stringify(orders))
-}
+let orders = JSON.parse(localStorage.getItem("orders")) || []
 
 /* вкладки */
 
@@ -269,54 +251,20 @@ if(tab==="history") renderLog()
 
 }
 
-/* счетчик */
-
-function add(){
-count++
-updateStatsOrder()
-save()
-updateUI()
-}
-
-function minus(){
-if(count>0)count--
-save()
-updateUI()
-}
-
-function reset(){
-if(confirm("Сбросить счетчик?")){
-count=0
-save()
-updateUI()
-}
-}
-
-/* заказ */
+/* добавить заказ */
 
 function addOrder(){
 
-let val=Number(document.getElementById("moneyInput").value)
+let val = Number(document.getElementById("moneyInput").value)
+if(!val) return
 
-if(!val)return
-
-count++
-
-let now=new Date()
-
-let date=now.toLocaleDateString()
-let time=now.toLocaleTimeString()
+let now = new Date()
 
 orders.unshift({
-date:date,
-time:time,
-money:val
+date: now.toLocaleDateString(),
+time: now.toLocaleTimeString(),
+money: val
 })
-
-if(!stats[date])stats[date]={orders:0,money:0}
-
-stats[date].orders++
-stats[date].money+=val
 
 document.getElementById("moneyInput").value=""
 
@@ -325,31 +273,71 @@ updateUI()
 
 }
 
-function updateStatsOrder(){
+/* ручной + */
 
-let d=today()
+function manualAdd(){
 
-if(!stats[d])stats[d]={orders:0,money:0}
+orders.unshift({
+date:new Date().toLocaleDateString(),
+time:new Date().toLocaleTimeString(),
+money:0
+})
 
-stats[d].orders++
+save()
+updateUI()
 
 }
 
-/* интерфейс */
+/* ручной - */
+
+function manualMinus(){
+
+orders.shift()
+
+save()
+updateUI()
+
+}
+
+/* сброс */
+
+function reset(){
+
+if(confirm("Сбросить всё?")){
+orders=[]
+save()
+updateUI()
+}
+
+}
+
+/* сохранить */
+
+function save(){
+localStorage.setItem("orders",JSON.stringify(orders))
+}
+
+/* обновление интерфейса */
 
 function updateUI(){
 
-document.getElementById("counter").innerText=count
+let today = new Date().toLocaleDateString()
 
-let d=today()
+let todayOrders=0
+let todayMoney=0
 
-let ordersToday=stats[d]?.orders||0
-let moneyToday=stats[d]?.money||0
+orders.forEach(o=>{
+if(o.date===today){
+todayOrders++
+todayMoney+=o.money
+}
+})
 
-document.getElementById("todayOrders").innerText=ordersToday
-document.getElementById("todayMoney").innerText=moneyToday+" ₴"
+document.getElementById("counter").innerText=todayOrders
+document.getElementById("todayOrders").innerText=todayOrders
+document.getElementById("todayMoney").innerText=todayMoney+" ₴"
 
-let avg=ordersToday?Math.round(moneyToday/ordersToday):0
+let avg = todayOrders ? Math.round(todayMoney/todayOrders) : 0
 document.getElementById("avgCheck").innerText=avg+" ₴"
 
 }
