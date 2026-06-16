@@ -50,8 +50,8 @@ input{width:100%;padding:14px;border:none;border-radius:8px;margin-top:8px;margi
 <div class="card">
 <b>Сегодня</b>
 <div class="stat-row"><span>Заказы</span><span id="todayOrders">0</span></div>
-<div class="stat-row"><span>Доход</span><span id="todayMoney">0 zł</span></div>
-<div class="stat-row"><span>Средний чек</span><span id="avgCheck">0 zł</span></div>
+<div class="stat-row"><span>Доход</span><span id="todayMoney">0 ₴</span></div>
+<div class="stat-row"><span>Средний чек</span><span id="avgCheck">0 ₴</span></div>
 </div>
 
 <div class="card">
@@ -129,10 +129,10 @@ function updateUI(){
  let money=stats[d]?.money||0;
 
  document.getElementById("todayOrders").innerText=orders;
- document.getElementById("todayMoney").innerText=money+" zł";
+ document.getElementById("todayMoney").innerText=money+" ₴";
 
  let avg=orders?Math.round(money/orders):0;
- document.getElementById("avgCheck").innerText=avg+" zł";
+ document.getElementById("avgCheck").innerText=avg+" ₴";
 
  renderHistory();
 }
@@ -149,7 +149,7 @@ function renderHistory(){
 
    let header=document.createElement("div");
    header.className="day-header";
-   header.innerHTML=`📅 ${date} — 📦 ${s.orders} | 💰 ${s.money} zł`;
+   header.innerHTML=`📅 ${date} — 📦 ${s.orders} | 💰 ${s.money} ₴`;
 
    let details=document.createElement("div");
    details.style.display="none";
@@ -158,14 +158,14 @@ function renderHistory(){
      s.list.forEach(order=>{
        let item=document.createElement("div");
        item.className="order-item";
-       item.innerHTML=`🕒 ${order.time} — 💰 ${order.money} zł`;
+       item.innerHTML=`🕒 ${order.time} — 💰 ${order.money} ₴`;
        details.appendChild(item);
      });
    }
 
    let total=document.createElement("div");
    total.className="day-total";
-   total.innerHTML=`Итого за день: ${s.money} zł`;
+   total.innerHTML=`Итого за день: ${s.money} ₴`;
    details.appendChild(total);
 
    header.onclick=()=>{
